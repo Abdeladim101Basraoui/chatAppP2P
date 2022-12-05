@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>chat</title>
+
+</head>
+
+<body>
+    <div>
+        <h2>
+            Message chat demo
+        </h2>
+    </div>
+
+
+    <div>
+        <ul id="message"></ul>
+    </div>
+
+    <div class="container">
+        <div class="child" style="margin:0 auto; width: fit-content;">
+
+            <textarea name="chat" id="messageloader" cols="70" rows="10" readonly></textarea>
+            <br> <input type="text" id="messageInput" placeholder="Enter message">
+
+            <button id="send">Send</button>
+            <!-- <button id="clear">Clear</button> -->
+        </div>
+    </div>
+    <!-- scripts -->
+    <script type="importmap">
+        {
+        "imports":{
+            "socket.io-client": "https://cdn.socket.io/4.4.1/socket.io.esm.min.js"
+        }
+        }
+    </script>
+
+    <script type="module">
+        import { io } from "socket.io-client";
+
+        const client = io("http://localhost:3000");
+
+        const textOne = document.getElementById('messageInput');
+        const clearBtn = document.getElementById('clear');
+        const sendBtn = document.getElementById('send');
+        const area = document.getElementById('messageloader');
+
+
+        //connected
+        client.on("connect", () => {
+            console.log("connected");
+        });
+
+        function handelSendData() {
+            area.value += `${client.id} : ${textOne.value} \n`;
+            // client.emit("message", { client: client, payload: textOne.value });
+            textOne.value = "";
+        }
+
+        client.on("message", (data) => {
+            area.value += `${data.client.id} : ${data.data.payload} \n`;
+        });
+
+        //send message
+        textOne.addEventListener("keypress", e => {
+            if (e.key === "Enter") {
+                handelSendData
+            }
+        });
+
+        sendBtn.addEventListener("click", handelSendData);
+
+    </script>
+</body>
+
+</html>
